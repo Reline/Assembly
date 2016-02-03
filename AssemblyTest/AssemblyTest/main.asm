@@ -1,16 +1,12 @@
 ExitProcess PROTO
 
-.data
-	qword1 qword 12345678ffeeddcch
+.code ; indicates where code begins
 
-.code
-	
-;'main' is our designated linker
-main proc	;start process main
-	mov rax, 2c5h	;move information to specified registry
-	mov rbx, qword1
-	mov rcx, 1
+getval proc ; define our process name as getval
+	mov rax, 1564
+	mov eax, 54
+	ret ;ret gives back the value in the last register used (eax in this case)
 
-	call ExitProcess
-main endp	;end process main
+	;call ExitProcess
+getval endp
 end
