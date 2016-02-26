@@ -3,78 +3,50 @@
 
 INCLUDE Irvine32.inc
 
-.data ; variables
-	array DWORD 10h,20h,30h,40h ; array of 32-bit unsigned doubles (16, 32, 48, 64)
-	myString BYTE 0h, 0h, 0h, 0h, 0h, 0h, 0h, 0h, 0h, 0h; array of ten 8-bit unsigned integers
+; macro for changing text color
+changeColor MACRO color
+	.code
+	mov eax, color+(black*16)
+	call SetTextColor
+	ENDM
+
+.data
+	str1 BYTE "Hurray colors", 0
 
 .code ; indicates where code begins
 
 main proc ; define our process name designated in the linker
 
-	;; PRINT RANDOM NUMBER
-	call Randomize ; sets random seed
-	mov eax,999 ; determines our range (0-999)
-	call RandomRange ; choose a random number from our range
-	call WriteDec ; write our random number to the console
-	; write newline
-	mov eax, 0Ah
-	call WriteChar
-	call RandomRange ; choose a random number from our range
-	call WriteDec ; write our random number to the console
-	; write newline
-	mov eax, 0Ah
-	call WriteChar
-	call RandomRange ; choose a random number from our range
-	call WriteDec ; write our random number to the console
-	; write newline
-	mov eax, 0Ah
-	call WriteChar
+mov ecx, 20 ; number of times to loop
 
-	;; SHOW BINARY
-	; save the size of the array (4)
-	; 4 will be used to track how many times to continue the loop
-    mov ecx,LENGTHOF array
-	; OFFSET store the address of array, 
-	; which points to the first number in the array
-    mov esi,OFFSET array	
-	; label our loop (L1)
-	; place the current index of esi into eax to be printed
-L1: mov eax,[esi]
-	; print binary value of number to screen from eax
-    call WriteBin
-	; write newline
-	mov eax, 0Ah
-	call WriteChar
-	; increment to the next number in the array by adding
-    ; TYPE gets DWORD, representing the size needed
-	; to increment between each value in the array
-	add esi,TYPE array 
-	; LOOP decrements ecx and checks if ecx is not zero, 
-	; if that condition is met it jumps to L1, otherwise falls through
-    loop L1
-
-	;; STORE USER INPUT
-    mov ecx,SIZEOF myString ; save loop increment count
-    mov esi,OFFSET myString ; save memory address of myString
-L2: call ReadChar ; read character into al register
-    mov [esi],al ; save character into myString
-	; print the characters we type to the screen
-	mov eax,[esi]
-	call WriteChar
-    inc esi ; increments 8-bit register
-    loop L2
-	; write newline
-	mov eax, 0Ah
-	call WriteChar
-	; print out word
-	mov ecx,SIZEOF myString ; save loop increment count
-    mov esi,OFFSET myString ; save memory address of myString
-L3: mov eax,[esi]
-	call WriteChar
-    inc esi ; increments 8-bit register
-    loop L3
+; blue 10%, green 60%, white 30%
+L1: call Randomize ; set random seed
+	mov eax, 9 ; set random range (0-9) including
+	call RandomRange ; move random number to eax
+	cmp eax, 3
+	je setBlue ; if 3, set blue
+	jg setGreen ; if greater than 3, set green
+	jmp setWhite ; else set white
 	
-    ret
+setBlue: changeColor blue
+		 jmp writeStr
+
+setGreen: changeColor green 
+		  jmp writeStr
+
+setWhite: changeColor white
+		  jmp writeStr
+
+writeStr: mov edx, OFFSET str1 ; move our string to be written
+		  call WriteString
+	      call Crlf
+		  dec ecx ; decrement our loop counter
+		  cmp ecx,0
+          jne L1 ; jump to L1 and run again if we haven't hit 20 loops
+		  changeColor white
+		  call Crlf
+		  call WaitMsg
+		  ret
 
 	main ENDP ; end our main process
 END
