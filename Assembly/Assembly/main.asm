@@ -1,52 +1,93 @@
-;; Nathan Reline
-;; SPT323 Intro to Assembly
-
 INCLUDE Irvine32.inc
 
-; macro for changing text color
-changeColor MACRO color
-	.code
-	mov eax, color+(black*16)
-	call SetTextColor
-	ENDM
-
 .data
-	str1 BYTE "Hurray colors", 0
+count = 100
+array WORD count DUP(?)
 
-.code ; indicates where code begins
+.code
+main proc
 
-main proc ; define our process name designated in the linker
+    push OFFSET array
+    push COUNT
+    call ArrayFill
 
-mov ecx, 20 ; number of times to loop
+    mov esi,OFFSET array
+    mov ecx,count
+    mov ebx,2
+    call DumpMem
 
-; blue 10%, green 60%, white 30%
-L1: call Randomize ; set random seed
-	mov eax, 9 ; set random range (0-9) including
-	call RandomRange ; move random number to eax
-	cmp eax, 3
-	je setBlue ; if 3, set blue
-	jg setGreen ; if greater than 3, set green
-	jmp setWhite ; else set white
-	
-setBlue: changeColor blue
-		 jmp writeStr
+SORT:
+    mov edx, 0 ; finished = false
+    mov esi,OFFSET array
+    mov ecx,count
+    call ArraySort
+    cmp edx, 0 ; if finished == false
+    jg SORT ; loop again
 
-setGreen: changeColor green 
-		  jmp writeStr
+    mov esi,OFFSET array
+    mov ecx,count
+    mov ebx,2
+    call DumpMem
+	call Crlf
 
-setWhite: changeColor white
-		  jmp writeStr
+	; loop through array and print each ascii value
+    mov esi,OFFSET array
+    mov ecx,count
+PRINT:
+    mov eax, [esi]
+    call WriteChar
+    add esi,TYPE WORD
+    loop PRINT
 
-writeStr: mov edx, OFFSET str1 ; move our string to be written
-		  call WriteString
-	      call Crlf
-		  dec ecx ; decrement our loop counter
-		  cmp ecx,0
-          jne L1 ; jump to L1 and run again if we haven't hit 20 loops
-		  changeColor white
-		  call Crlf
-		  call WaitMsg
-		  ret
+    ret
+main endp
 
-	main ENDP ; end our main process
-END
+ArrayFill PROC
+    push ebp
+    mov ebp,esp
+    pushad
+
+    mov esi,[ebp+12]    ; offset of array
+    mov ecx,[ebp+8]    ; array size
+    cmp ecx,0
+    jle L2
+L1:
+    mov eax,223 ; get random 32 -> 255
+    call RandomRange
+	add eax, 32
+    mov [esi],eax
+    add esi,TYPE WORD
+    loop L1
+
+L2: 
+    popad
+    pop ebp
+    ret 8    ; clean up the stack
+ArrayFill ENDP
+
+ArraySort PROC
+    mov ecx, count-1
+
+L3: ; COMPARE
+    mov eax, 0
+    mov ebx, 0
+    mov ax, [esi]
+    mov bx, [esi+2] ; 2 bytes
+    cmp eax, ebx ; compare current index to next index
+    ja L4 ; jump if greater
+    add esi, TYPE array ; increment index
+    loop L3 ; decrement ecx
+    ret
+
+L4: ; SWAP
+    inc edx ; indicate we swapped two values
+    ; swap esi and esi-2
+    mov [esi], bx
+    mov [esi+2], ax
+    add esi, TYPE array ; increment index
+    loop L3
+    ret
+
+ArraySort ENDP
+
+END main
