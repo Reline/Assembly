@@ -1,93 +1,117 @@
 INCLUDE Irvine32.inc
 
 .data
-count = 100
-array WORD count DUP(?)
+count = 65000 ; 'roof' for prime number search
+prompt BYTE "Prime numbers from 0-", 0
+done BYTE "Done", 0
+
+.data?
+array DWORD count DUP(?) ; declare array in uninitialized data segment
 
 .code
 main proc
+	
+	; zero out array
+	mov esi, OFFSET array
+	mov ecx, count
+L1: mov eax, 0
+	mov [esi], eax
+	add esi, TYPE array
+	loop L1
 
-    push OFFSET array
-    push COUNT
-    call ArrayFill
+	; move back to beginning of array
+	mov esi, OFFSET array ; 1
+	add esi, TYPE array ; 2
+	add esi, TYPE array ; 3
+	mov ecx, 3 ; store current index in ecx ; 1st index = 1st element
+	mov ebx, 2 ; store current prime number
 
-    mov esi,OFFSET array
-    mov ecx,count
-    mov ebx,2
-    call DumpMem
+L2: ; skip if current index equals current prime number
+	cmp ecx, ebx
+	je con
+	; DIV stores the quotient in AX and remainder in DX
+	mov eax, ecx
+	xor edx, edx
+	div bx
+	; if the remainder is 0, set current index to composite
+	cmp dx, 0
+	jnz con
+	mov eax, [esi]
+	mov eax, 1
+	mov [esi], eax
 
-SORT:
-    mov edx, 0 ; finished = false
-    mov esi,OFFSET array
-    mov ecx,count
-    call ArraySort
-    cmp edx, 0 ; if finished == false
-    jg SORT ; loop again
+	; go to next index if we haven't finished searching with current prime number
+con: add esi, TYPE array
+	inc ecx
+	cmp ecx, count
+	jle L2
 
-    mov esi,OFFSET array
-    mov ecx,count
-    mov ebx,2
-    call DumpMem
+	; set esi back to the correct index
+	mov esi, OFFSET array
+	mov ecx, 1
+L3: add esi, TYPE array
+	inc ecx
+	cmp cx, bx
+	jne L3
+	
+	; find the next prime number
+L4: add esi, TYPE array
+	inc ecx
+	; check if we reached the end of the array and found no new prime numbers
+	cmp ecx, count
+	jg L5 ; quit if we have gone past the array
+	; if value at current index = 0, set new prime number
+	mov eax, [esi]
+	mov eax, 0
+	cmp [esi], eax
+	jnz L4
+	mov ebx, ecx
+	jmp L2
+
+	
+L5:	; print entire array
+	;mov esi, OFFSET array
+	;mov ecx, 1
+;L7: mov eax, ecx
+	;call WriteDec
+	;call Crlf
+	;mov eax, [esi]
+	;call WriteDec
+	;call Crlf
+	;call Crlf
+	;inc ecx
+	;add esi, TYPE array
+	;cmp ecx, count
+	;jle L7
+
+	; print all prime numbers
+	mov edx, OFFSET prompt
+	call WriteString
+	mov eax, count
+	call WriteDec
 	call Crlf
+	call Crlf
+	mov esi, OFFSET array
+	; 1 is not a prime number, so skip it
+	mov ecx, 2
+	add esi, TYPE array
+L6: mov eax, ecx
+	mov eax, 0
+	cmp [esi], eax
+	jnz composite
+	mov eax, ecx
+	call WriteDec
+	call Crlf
+composite:	add esi, TYPE array
+	inc ecx
+	cmp ecx, count
+	jle L6
+	
+	mov edx, OFFSET done
+	call Crlf
+	call WriteString
 
-	; loop through array and print each ascii value
-    mov esi,OFFSET array
-    mov ecx,count
-PRINT:
-    mov eax, [esi]
-    call WriteChar
-    add esi,TYPE WORD
-    loop PRINT
-
-    ret
-main endp
-
-ArrayFill PROC
-    push ebp
-    mov ebp,esp
-    pushad
-
-    mov esi,[ebp+12]    ; offset of array
-    mov ecx,[ebp+8]    ; array size
-    cmp ecx,0
-    jle L2
-L1:
-    mov eax,223 ; get random 32 -> 255
-    call RandomRange
-	add eax, 32
-    mov [esi],eax
-    add esi,TYPE WORD
-    loop L1
-
-L2: 
-    popad
-    pop ebp
-    ret 8    ; clean up the stack
-ArrayFill ENDP
-
-ArraySort PROC
-    mov ecx, count-1
-
-L3: ; COMPARE
-    mov eax, 0
-    mov ebx, 0
-    mov ax, [esi]
-    mov bx, [esi+2] ; 2 bytes
-    cmp eax, ebx ; compare current index to next index
-    ja L4 ; jump if greater
-    add esi, TYPE array ; increment index
-    loop L3 ; decrement ecx
-    ret
-
-L4: ; SWAP
-    inc edx ; indicate we swapped two values
-    ; swap esi and esi-2
-    mov [esi], bx
-    mov [esi+2], ax
-    add esi, TYPE array ; increment index
-    loop L3
-    ret
-
-ArraySort ENDP
+	ret
+main ENDP
 
 END main
