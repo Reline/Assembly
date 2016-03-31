@@ -6,26 +6,24 @@ POINT STRUCT
    Y WORD ?
 POINT ENDS
 
-POLY STRUCT
-   points POINT 10 DUP(<>)
-   numPoints WORD 10
-POLY ENDS
+Rectangle STRUCT
+   upperLeft POINT <>
+   lowerRight POINT <>
+Rectangle ENDS
 
 .data
-   aPoly POLY <>
+; create an array of three identical rectangles
+myRectArray Rectangle 3 DUP(<<10,20>,<50,60>>)
 
 .code
 main proc
-   xor ecx, ecx
-   mov cx, aPoly.numPoints ; save loop counter
-   mov esi, OFFSET aPoly.points.X ; set first X memory location
-L1: 
-   call Randomize ; sets random seed
-   mov eax, 99 ; determine range (0-99)
-   call RandomRange ; get random number from range
-   mov [esi], eax ; move random number into X
-   add esi, SIZEOF POINT ; increment to next point
-   loop L1 ; loop if we haven't done all points
+   mov esi, OFFSET myRectArray ; index 1
+   add esi, SIZEOF Rectangle ; increment to index 2
+   add esi, SIZEOF Rectangle ; increment to index 3
+   mov eax, 80 ; ready 80 to move
+   ; place 80 inside the current Rectangle.upperLeft.X
+   mov (Rectangle PTR [esi]).upperLeft.X, ax 
+
    ret
 main ENDP ; end main process
 
