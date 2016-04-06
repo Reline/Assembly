@@ -1,66 +1,48 @@
 INCLUDE Irvine32.inc
 
 .data
-COUNT = 5
+Node STRUCT
+	val		DWORD	? ; node data
+	nextPtr DWORD	? ; pointer to next node in list
+Node ENDS
 
-arrayA DWORD COUNT DUP(?)
-arrayB DWORD COUNT DUP(?)
+decNum		DWORD	?
+listSize	DWORD	?
+prompt		BYTE	"Enter an integer: ", 0
+badPrompt	BYTE	"Invalid input, enter an integer: ", 0
+head Node <>
 
 .code
-ArrayFill PROC
-    push ebp
-    mov ebp,esp
-    pushad
-
-    mov esi,[ebp+12]    ; offset of array
-    mov ecx,[ebp+8]    ; array size
-    cmp ecx,0
-    jle L2
-L1:
-    mov eax,25 ; get random 97 -> 122
-    call RandomRange
-   add eax, 97
-   call WriteChar
-    mov [esi],eax
-    add esi,TYPE DWORD
-    loop L1
-
-L2: 
-    popad
-    pop ebp
-    ret 8    ; clean up the stack
-ArrayFill ENDP
-
 main proc
+	
+	xor eax, eax			; clear eax
+	mov esi, OFFSET head	; store pointer to list
 
-   ; fill our arrays with random characters (a-z lowercase)
-   push OFFSET arrayA
-   push COUNT
-   call ArrayFill
-   call Crlf
-
-   push OFFSET arrayB
-   push COUNT
-   call ArrayFill
-   call Crlf
-
-   mov ecx, COUNT ; set our counter
-   mov esi, OFFSET arrayA ; set our pointer to the beginning of arrayA
-   add esi, SIZEOF arrayA ; increment the pointer to the end of the array
-   mov edi, OFFSET arrayB ; set our pointer to the beginning of arrayB
-   add edi, SIZEOF arrayB ; increment the pointer to the end of the array
 L1:
-   sub esi, TYPE arrayA ; decrement through arrayA
-   mov eax, [esi] ; move our char from arrayA into eax
-   sub edi, TYPE arrayB ; decrement through arayB
-   mov ebx, [edi] ; move our char from arrayB into ebx
-   cmpsd ; compare values at current index (ecx)
-   jne L2 ; if value are not equal, end
-   loop L1 ; if values are equal, loop again while not yet reached beginning of array
+	; prompt user
+	mov edx, OFFSET prompt
+	call WriteString
+L2: ; validate input
+	call ReadInt	; store user input in eax
+	jno L3			; jump if no carry (valid int)
 
-L2: 
-   call DumpRegs
-   ret
-main ENDP ; end main process
+	; invalid input
+	mov edx, OFFSET badPrompt
+	call WriteString
+	jmp L2
 
-END main ; end main.asm
+L3: ; check input for 0 (end program)
+	cmp eax, 0
+	je L4
+	; make new node
+	mov (Node PTR [esi]).val, eax
+
+
+	jmp L1
+
+L4: ; print all nodes
+
+	ret
+main endp
+END main
+END

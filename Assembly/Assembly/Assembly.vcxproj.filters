@@ -18,5 +18,41 @@
     <MASM Include="main.asm">
       <Filter>Source Files</Filter>
     </MASM>
+    <MASM Include="quadraticformula.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="datadef.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="basics.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="randcolor.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="sortfillarray.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="prime.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="str_find.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="lowtoup.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="structception.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="structarray.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="tolower.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+    <MASM Include="reversecmp.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
   </ItemGroup>
 </Project>

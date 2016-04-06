@@ -151,9 +151,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <MASM Include="datadef.asm" />
+    <MASM Include="lowtoup.asm" />
     <MASM Include="main.asm">
       <FileType>Document</FileType>
     </MASM>
+    <MASM Include="prime.asm" />
+    <MASM Include="quadraticformula.asm" />
+    <MASM Include="basics.asm" />
+    <MASM Include="randcolor.asm" />
+    <MASM Include="reversecmp.asm" />
+    <MASM Include="sortfillarray.asm" />
+    <MASM Include="structarray.asm" />
+    <MASM Include="structception.asm" />
+    <MASM Include="str_find.asm" />
+    <MASM Include="tolower.asm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
