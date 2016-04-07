@@ -54,5 +54,8 @@
     <MASM Include="reversecmp.asm">
       <Filter>Source Files</Filter>
     </MASM>
+    <MASM Include="linkedlist.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
   </ItemGroup>
 </Project>

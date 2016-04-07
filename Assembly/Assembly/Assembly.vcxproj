@@ -152,6 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <MASM Include="datadef.asm" />
+    <MASM Include="linkedlist.asm" />
     <MASM Include="lowtoup.asm" />
     <MASM Include="main.asm">
       <FileType>Document</FileType>
