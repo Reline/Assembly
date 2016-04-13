@@ -1,0 +1,28 @@
+{
+	"folders":
+	[
+		{
+			"path": ".",
+			"folder_exclude_patterns": [".svn", "._d", ".metadata", ".settings", ".git", "*Debug"],
+			"file_exclude_patterns": ["*.pyc", "*.pyo", ".project"]
+		}
+	],
+	"build_systems":
+	[
+		{
+			"name": "build",
+			"working_dir": "$project_path",
+			"shell_cmd": "cmd /C $project_path\\build.bat"
+		},
+		{
+			"name": "run",
+			"working_dir": "$project_path",
+			"shell_cmd": "cmd /C $project_path\\run.bat"
+		},
+		{
+			"name": "debug",
+			"working_dir": "$project_path",
+			"shell_cmd": "cmd /C $project_path\\debug.bat"
+		}
+	]
+}
